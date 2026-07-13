@@ -412,7 +412,7 @@
         }
         .dish-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 6px 10px;
             flex-wrap: wrap;
             justify-content: center;
@@ -421,6 +421,7 @@
             border-radius: 40px;
             border: 1px solid transparent;
             transition: 0.2s;
+            max-width: 100%;
         }
         .dish-item:hover {
             background: rgba(255, 240, 245, 0.6);
@@ -433,6 +434,7 @@
             accent-color: #b28080;
             cursor: pointer;
             flex-shrink: 0;
+            margin-top: 3px;
         }
         .dish-item label {
             font-weight: 400;
@@ -441,6 +443,50 @@
             margin-bottom: 0;
             font-size: 0.95rem;
             text-align: left;
+            line-height: 1.4;
+            flex: 1;
+        }
+        .dish-item .dish-name {
+            display: inline;
+        }
+        .dish-item .dish-composition {
+            display: none;
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 300;
+            line-height: 1.5;
+            padding-top: 4px;
+            padding-left: 4px;
+            border-top: 1px dashed #e0d0d4;
+            margin-top: 4px;
+        }
+        .dish-item .dish-composition.open {
+            display: block;
+        }
+        .composition-toggle {
+            display: inline-block;
+            font-size: 0.75rem;
+            color: #a86a72;
+            cursor: pointer;
+            margin-left: 8px;
+            font-weight: 400;
+            text-decoration: none;
+            border-bottom: 1px dashed #a86a72;
+            user-select: none;
+            transition: color 0.2s;
+        }
+        .composition-toggle:hover {
+            color: #7a4a4a;
+            border-bottom-color: #7a4a4a;
+        }
+        .composition-toggle .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            font-size: 0.6rem;
+            margin-left: 2px;
+        }
+        .composition-toggle.open .arrow {
+            transform: rotate(180deg);
         }
 
         .map-wrapper {
@@ -471,12 +517,17 @@
             margin-top: 10px;
             box-shadow: 0 8px 25px rgba(168, 106, 114, 0.3);
         }
-        .btn-submit:hover {
+        .btn-submit:hover:not(:disabled) {
             transform: translateY(-2px);
             box-shadow: 0 12px 35px rgba(168, 106, 114, 0.4);
             background: linear-gradient(135deg, #d4959a, #b87a82);
         }
-        .btn-submit:active { transform: scale(0.97); }
+        .btn-submit:active:not(:disabled) { transform: scale(0.97); }
+        .btn-submit:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
 
         .vpn-note {
             text-align: center;
@@ -579,11 +630,13 @@
             .dish-grid { gap: 6px 10px; }
             .dish-item { padding: 4px 10px; }
             .dish-item label { font-size: 0.85rem; }
+            .dish-item .dish-composition { font-size: 0.7rem; }
             .map-wrapper iframe { height: 120px; }
             .btn-submit { font-size: 1rem; padding: 14px; }
             .footer-note { font-size: 0.8rem; }
             .gift-message { padding: 15px 18px; }
             .gift-message p { font-size: 0.9rem; }
+            .composition-toggle { font-size: 0.7rem; }
         }
 
         @media (max-width: 430px) {
@@ -597,6 +650,8 @@
             .vpn-note { font-size: 0.75rem; }
             .gift-message { padding: 12px 14px; }
             .gift-message p { font-size: 0.85rem; }
+            .dish-item .dish-composition { font-size: 0.65rem; }
+            .composition-toggle { font-size: 0.65rem; }
         }
     </style>
 </head>
@@ -719,7 +774,7 @@
         <div class="menu-title">Выбор меню</div>
         <div class="divider">❀ ✿ ❀</div>
 
-        <!-- 1. ЗАКУСКИ -->
+        <!-- 1. ЗАКУСКИ (убраны "Разносолы") -->
         <div class="menu-section">
             <h3>Закуски</h3>
             <div class="hint">(можно выбрать несколько вариантов)</div>
@@ -737,64 +792,80 @@
                     <label for="appetizer3">Лосось слабосоленый</label>
                 </div>
                 <div class="dish-item">
-                    <input type="checkbox" id="appetizer4" name="Закуски" value="Разносолы" />
-                    <label for="appetizer4">Разносолы</label>
-                </div>
-                <div class="dish-item">
                     <input type="checkbox" id="appetizer5" name="Закуски" value="Овощная тарелка" />
                     <label for="appetizer5">Овощная тарелка</label>
                 </div>
             </div>
         </div>
 
-        <!-- 2. САЛАТЫ -->
+        <!-- 2. САЛАТЫ (без изменений) -->
         <div class="menu-section">
             <h3>Салаты</h3>
             <div class="hint">(выберите один вариант)</div>
             <div class="dish-grid">
                 <div class="dish-item">
-                    <input type="radio" id="salad1" name="Салаты" value="Цезарь с курицей" />
-                    <label for="salad1">Цезарь с курицей</label>
+                    <input type="radio" id="salad0" name="Салаты" value="Салат не нужен" />
+                    <label for="salad0">Салат не нужен</label>
                 </div>
                 <div class="dish-item">
-                    <input type="radio" id="salad2" name="Салаты" value="Греческий" />
-                    <label for="salad2">Греческий</label>
+                    <input type="radio" id="salad1" name="Салаты" value="Зеленый салат" />
+                    <label for="salad1">
+                        <span class="dish-name">Зеленый салат</span>
+                        <span class="composition-toggle" data-target="comp1">Состав <span class="arrow">▼</span></span>
+                        <span class="dish-composition" id="comp1">Авокадо, сельдерей, брокколи, микс салат, огурцы, бобы эдамаме, заправка медово-горчичная</span>
+                    </label>
                 </div>
                 <div class="dish-item">
-                    <input type="radio" id="salad3" name="Салаты" value="Оливье" />
-                    <label for="salad3">Оливье</label>
+                    <input type="radio" id="salad2" name="Салаты" value="Салат со слабосоленой семгой и киноа" />
+                    <label for="salad2">
+                        <span class="dish-name">Салат со слабосоленой семгой и киноа</span>
+                        <span class="composition-toggle" data-target="comp2">Состав <span class="arrow">▼</span></span>
+                        <span class="dish-composition" id="comp2">Семга слабосоленая, микс салата, киноа, огурец, томат, гуакамоле, соус устричный, соус СвитЧили, домашний майонез, фреш лайма, оливковое масло</span>
+                    </label>
                 </div>
                 <div class="dish-item">
-                    <input type="radio" id="salad4" name="Салаты" value="Сельдь под шубой" />
-                    <label for="salad4">Сельдь под шубой</label>
+                    <input type="radio" id="salad3" name="Салаты" value="Салат с креветками и соусом из спелого манго" />
+                    <label for="salad3">
+                        <span class="dish-name">Салат с креветками и соусом из спелого манго</span>
+                        <span class="composition-toggle" data-target="comp3">Состав <span class="arrow">▼</span></span>
+                        <span class="dish-composition" id="comp3">Креветки, апельсины, томаты Черри, микс салата, соус из спелого манго, соус на основе орехов Макадамия, сливочный сыр, миндальные лепестки</span>
+                    </label>
                 </div>
                 <div class="dish-item">
-                    <input type="radio" id="salad5" name="Салаты" value="Мимоза" />
-                    <label for="salad5">Мимоза</label>
+                    <input type="radio" id="salad4" name="Салаты" value="Салат с уткой горячего копчения и вяленой свеклой" />
+                    <label for="salad4">
+                        <span class="dish-name">Салат с уткой горячего копчения и вяленой свеклой</span>
+                        <span class="composition-toggle" data-target="comp4">Состав <span class="arrow">▼</span></span>
+                        <span class="dish-composition" id="comp4">Филе утиной грудки собственного копчения, вяленая свекла, микс салата, сливочный сыр, заправка медово-горчичная, пекан, зеленое масло</span>
+                    </label>
+                </div>
+                <div class="dish-item">
+                    <input type="radio" id="salad5" name="Салаты" value="Салат с хрустящим цыпленком, баклажанами и грибами" />
+                    <label for="salad5">
+                        <span class="dish-name">Салат с хрустящим цыпленком, баклажанами и грибами</span>
+                        <span class="composition-toggle" data-target="comp5">Состав <span class="arrow">▼</span></span>
+                        <span class="dish-composition" id="comp5">Филе бедра цыпленка, баклажаны, шампиньоны, вешенки, томаты, микс салата, соус азиатский</span>
+                    </label>
                 </div>
             </div>
         </div>
 
-        <!-- 3. ГОРЯЧИЕ БЛЮДА -->
+        <!-- 3. ГОРЯЧИЕ БЛЮДА (обновлено) -->
         <div class="menu-section">
             <h3>Горячие блюда</h3>
             <div class="hint">(выберите один вариант)</div>
             <div class="dish-grid">
                 <div class="dish-item">
-                    <input type="radio" id="hot1" name="Горячее" value="Курица гриль" />
-                    <label for="hot1">Курица гриль</label>
+                    <input type="radio" id="hot1" name="Горячее" value="Куриное бедро" />
+                    <label for="hot1">Куриное бедро</label>
                 </div>
                 <div class="dish-item">
-                    <input type="radio" id="hot2" name="Горячее" value="Свинина с овощами" />
-                    <label for="hot2">Свинина с овощами</label>
+                    <input type="radio" id="hot2" name="Горячее" value="Свиная шейка" />
+                    <label for="hot2">Свиная шейка</label>
                 </div>
                 <div class="dish-item">
-                    <input type="radio" id="hot3" name="Горячее" value="Рыба запечённая" />
-                    <label for="hot3">Рыба запечённая</label>
-                </div>
-                <div class="dish-item">
-                    <input type="radio" id="hot4" name="Горячее" value="Вегетарианское рагу" />
-                    <label for="hot4">Вегетарианское рагу</label>
+                    <input type="radio" id="hot3" name="Горячее" value="Филе форели" />
+                    <label for="hot3">Филе форели</label>
                 </div>
             </div>
         </div>
@@ -825,7 +896,7 @@
             <textarea id="comment" name="Комментарий" placeholder="Например, без орехов, вегетарианский вариант..."></textarea>
         </div>
 
-        <button type="submit" class="btn-submit">📩 Отправить выбор</button>
+        <button type="submit" class="btn-submit" id="submitBtn" disabled>📩 Отправить выбор</button>
         <div class="vpn-note">⚠️ Перед отправкой убедитесь, что VPN отключён!</div>
     </form>
 
@@ -834,7 +905,6 @@
         <span style="font-size:0.9rem;">💕 С нетерпением ждём встречи!</span>
     </div>
 
-    <!-- НОВОЕ ПОСЛЕДНЕЕ ФОТО -->
     <div class="couple-photo couple-photo-bottom">
         <img src="https://i.ibb.co/C3kZz6q2/Tsdv-RR3t-F7-YRCg-YTY55-HLp-Z4-Gz-Cyr4-Iectju6r-U1-S68f-UDN9-ESkt-U99ha-RADiy-RZ4t-IMJI70-CJP1s3-W-u-Sb-NLc.jpg" alt="Илья и Мария" />
     </div>
@@ -875,13 +945,67 @@
         setInterval(updateTimer, 1000);
     })();
 
+    // === ВЫПАДАЮЩИЙ СОСТАВ ДЛЯ САЛАТОВ ===
+    document.querySelectorAll('.composition-toggle').forEach(function(toggle) {
+        toggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const targetId = this.getAttribute('data-target');
+            const composition = document.getElementById(targetId);
+            if (composition) {
+                composition.classList.toggle('open');
+                this.classList.toggle('open');
+                const arrow = this.querySelector('.arrow');
+                if (arrow) {
+                    arrow.textContent = composition.classList.contains('open') ? '▲' : '▼';
+                }
+            }
+        });
+    });
+
+    // === ВАЛИДАЦИЯ ФОРМЫ ===
     (function() {
         const form = document.getElementById('wedding-form');
         const nameInput = document.getElementById('guest-name');
         const nameError = document.getElementById('name-error');
         const successMsg = document.getElementById('success-msg');
+        const submitBtn = document.getElementById('submitBtn');
+
+        function checkValidity() {
+            const name = nameInput.value.trim();
+            const isNameFilled = name.length > 0;
+
+            const appetizers = document.querySelectorAll('input[name="Закуски"]');
+            let appetizerSelected = false;
+            appetizers.forEach(inp => { if (inp.checked) appetizerSelected = true; });
+
+            const salads = document.querySelectorAll('input[name="Салаты"]');
+            let saladSelected = false;
+            salads.forEach(inp => { if (inp.checked) saladSelected = true; });
+
+            const hots = document.querySelectorAll('input[name="Горячее"]');
+            let hotSelected = false;
+            hots.forEach(inp => { if (inp.checked) hotSelected = true; });
+
+            const isValid = isNameFilled && appetizerSelected && saladSelected && hotSelected;
+            submitBtn.disabled = !isValid;
+            return isValid;
+        }
+
+        nameInput.addEventListener('input', checkValidity);
+        document.querySelectorAll('input[name="Закуски"]').forEach(el => el.addEventListener('change', checkValidity));
+        document.querySelectorAll('input[name="Салаты"]').forEach(el => el.addEventListener('change', checkValidity));
+        document.querySelectorAll('input[name="Горячее"]').forEach(el => el.addEventListener('change', checkValidity));
+
+        window.addEventListener('load', checkValidity);
 
         form.addEventListener('submit', function(e) {
+            if (!checkValidity()) {
+                e.preventDefault();
+                alert('Пожалуйста, заполните все обязательные поля: имя, закуски, салат, горячее.');
+                return;
+            }
+
             const name = nameInput.value.trim();
             if (!name) {
                 e.preventDefault();
@@ -892,16 +1016,6 @@
             } else {
                 nameInput.classList.remove('error');
                 nameError.classList.remove('show');
-            }
-
-            const inputs = form.querySelectorAll('input[type="checkbox"], input[type="radio"]');
-            let selected = false;
-            inputs.forEach(inp => { if (inp.checked) selected = true; });
-
-            if (!selected) {
-                e.preventDefault();
-                alert('Пожалуйста, выберите хотя бы одно блюдо 😊');
-                return;
             }
 
             e.preventDefault();

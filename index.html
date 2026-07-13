@@ -517,17 +517,12 @@
             margin-top: 10px;
             box-shadow: 0 8px 25px rgba(168, 106, 114, 0.3);
         }
-        .btn-submit:hover:not(:disabled) {
+        .btn-submit:hover {
             transform: translateY(-2px);
             box-shadow: 0 12px 35px rgba(168, 106, 114, 0.4);
             background: linear-gradient(135deg, #d4959a, #b87a82);
         }
-        .btn-submit:active:not(:disabled) { transform: scale(0.97); }
-        .btn-submit:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            box-shadow: none;
-        }
+        .btn-submit:active { transform: scale(0.97); }
 
         .vpn-note {
             text-align: center;
@@ -896,7 +891,7 @@
             <textarea id="comment" name="Комментарий" placeholder="Например, без орехов, вегетарианский вариант..."></textarea>
         </div>
 
-        <button type="submit" class="btn-submit" id="submitBtn" disabled>📩 Отправить выбор</button>
+        <button type="submit" class="btn-submit">📩 Отправить выбор</button>
         <div class="vpn-note">⚠️ Перед отправкой убедитесь, что VPN отключён!</div>
     </form>
 
@@ -963,67 +958,14 @@
         });
     });
 
-    // === ВАЛИДАЦИЯ ФОРМЫ (с поддержкой мобильных устройств) ===
+    // === ОТПРАВКА ФОРМЫ (без блокировки кнопки) ===
     (function() {
         const form = document.getElementById('wedding-form');
         const nameInput = document.getElementById('guest-name');
         const nameError = document.getElementById('name-error');
         const successMsg = document.getElementById('success-msg');
-        const submitBtn = document.getElementById('submitBtn');
 
-        function checkValidity() {
-            const name = nameInput.value.trim();
-            const isNameFilled = name.length > 0;
-
-            const appetizers = document.querySelectorAll('input[name="Закуски"]');
-            let appetizerSelected = false;
-            appetizers.forEach(inp => { if (inp.checked) appetizerSelected = true; });
-
-            const salads = document.querySelectorAll('input[name="Салаты"]');
-            let saladSelected = false;
-            salads.forEach(inp => { if (inp.checked) saladSelected = true; });
-
-            const hots = document.querySelectorAll('input[name="Горячее"]');
-            let hotSelected = false;
-            hots.forEach(inp => { if (inp.checked) hotSelected = true; });
-
-            const isValid = isNameFilled && appetizerSelected && saladSelected && hotSelected;
-            submitBtn.disabled = !isValid;
-            return isValid;
-        }
-
-        // Функция для принудительного обновления валидации
-        function forceCheck() {
-            checkValidity();
-        }
-
-        // События для имени
-        nameInput.addEventListener('input', forceCheck);
-        nameInput.addEventListener('change', forceCheck);
-
-        // События для всех чекбоксов и радио (на случай, если change не срабатывает на мобильных)
-        const allInputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
-        allInputs.forEach(inp => {
-            inp.addEventListener('change', forceCheck);
-            inp.addEventListener('click', forceCheck);   // для надёжности на мобильных
-            inp.addEventListener('touchend', forceCheck); // явно для тач-устройств
-        });
-
-        // Также обновляем при клике на любой элемент формы (для надёжности)
-        form.addEventListener('click', forceCheck);
-        form.addEventListener('touchstart', forceCheck);
-
-        // При загрузке страницы — проверить начальное состояние
-        window.addEventListener('load', forceCheck);
-
-        // Обработка отправки
         form.addEventListener('submit', function(e) {
-            if (!checkValidity()) {
-                e.preventDefault();
-                alert('Пожалуйста, заполните все обязательные поля: имя, закуски, салат, горячее.');
-                return;
-            }
-
             const name = nameInput.value.trim();
             if (!name) {
                 e.preventDefault();
@@ -1034,6 +976,17 @@
             } else {
                 nameInput.classList.remove('error');
                 nameError.classList.remove('show');
+            }
+
+            // Проверяем, выбран ли хоть один пункт меню (закуски, салаты, горячее)
+            const inputs = form.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+            let selected = false;
+            inputs.forEach(inp => { if (inp.checked) selected = true; });
+
+            if (!selected) {
+                e.preventDefault();
+                alert('Пожалуйста, выберите хотя бы одно блюдо 😊');
+                return;
             }
 
             e.preventDefault();

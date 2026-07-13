@@ -21,9 +21,16 @@
             background-attachment: fixed;
             position: relative;
             overflow-x: hidden;
+            /* Явно разрешаем выделение текста и взаимодействие */
+            -webkit-user-select: text;
+            user-select: text;
+            -webkit-touch-callout: default;
         }
 
-        .petals-container {
+        /* Контейнеры с декорациями — не должны мешать взаимодействию */
+        .petals-container,
+        .sparkles-container,
+        .hearts-container {
             position: fixed;
             top: 0;
             left: 0;
@@ -33,6 +40,7 @@
             z-index: 0;
             overflow: hidden;
         }
+
         .petal {
             position: absolute;
             font-size: 1.8rem;
@@ -40,6 +48,7 @@
             animation: fall linear infinite;
             user-select: none;
             color: #ffb6c1;
+            pointer-events: none;
         }
         @keyframes fall {
             0% { transform: translateY(-10vh) rotate(0deg) scale(0.5); opacity: 0.7; }
@@ -54,16 +63,6 @@
         .petal:nth-child(7) { left: 85%; animation-duration: 22s; animation-delay: 2.5s; font-size: 2.1rem; }
         .petal:nth-child(8) { left: 92%; animation-duration: 13s; animation-delay: 4.5s; font-size: 1.9rem; }
 
-        .sparkles-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
         .sparkle {
             position: absolute;
             font-size: 0.9rem;
@@ -71,6 +70,7 @@
             text-shadow: 0 0 10px rgba(255, 215, 215, 0.8);
             animation: twinkle 3s ease-in-out infinite alternate;
             user-select: none;
+            pointer-events: none;
         }
         @keyframes twinkle {
             0% { opacity: 0.1; transform: scale(0.8); }
@@ -85,22 +85,13 @@
         .sparkle:nth-child(7) { top: 15%; left: 50%; animation-delay: 3s; font-size: 1rem; }
         .sparkle:nth-child(8) { top: 75%; left: 45%; animation-delay: 0.8s; font-size: 1.2rem; }
 
-        .hearts-container {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
-            overflow: hidden;
-        }
         .heart-float {
             position: absolute;
             font-size: 1.8rem;
             opacity: 0.35;
             animation: floatUp linear infinite;
             user-select: none;
+            pointer-events: none;
         }
         @keyframes floatUp {
             0% { transform: translateY(100vh) rotate(0deg) scale(0.4); opacity: 0.3; }
@@ -133,6 +124,8 @@
             box-shadow: 0 30px 80px rgba(120, 60, 80, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.8);
             transition: all 0.3s ease;
+            /* Явно разрешаем touch-события */
+            touch-action: manipulation;
         }
 
         .card::before {
@@ -148,6 +141,7 @@
             white-space: nowrap;
             width: 90%;
             text-align: center;
+            pointer-events: none;
         }
         .card::after {
             content: '✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦ ✦';
@@ -162,6 +156,7 @@
             white-space: nowrap;
             width: 90%;
             text-align: center;
+            pointer-events: none;
         }
 
         @keyframes fadeInUp {
@@ -255,6 +250,7 @@
             padding: 15px 10px;
             margin-bottom: 20px;
             border: 1px solid #f0d8e0;
+            touch-action: manipulation;
         }
         .timer-section h3 {
             font-size: 1.1rem;
@@ -306,6 +302,7 @@
 
         .form-group {
             margin-bottom: 20px;
+            touch-action: manipulation;
         }
         label {
             display: block;
@@ -327,6 +324,10 @@
             background: rgba(255, 248, 250, 0.7);
             transition: 0.3s;
             outline: none;
+            /* Явно разрешаем ввод на мобильных */
+            -webkit-user-select: text;
+            user-select: text;
+            touch-action: manipulation;
         }
         select {
             width: 100%;
@@ -345,6 +346,7 @@
             background-position: right 15px center;
             background-size: 14px 14px;
             cursor: pointer;
+            touch-action: manipulation;
         }
         select:focus,
         input:focus,
@@ -422,6 +424,8 @@
             border: 1px solid transparent;
             transition: 0.2s;
             max-width: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
         }
         .dish-item:hover {
             background: rgba(255, 240, 245, 0.6);
@@ -429,12 +433,16 @@
         }
         .dish-item input[type="checkbox"],
         .dish-item input[type="radio"] {
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             accent-color: #b28080;
             cursor: pointer;
             flex-shrink: 0;
             margin-top: 3px;
+            touch-action: manipulation;
+            /* Увеличиваем область касания */
+            min-width: 20px;
+            min-height: 20px;
         }
         .dish-item label {
             font-weight: 400;
@@ -445,6 +453,7 @@
             text-align: left;
             line-height: 1.4;
             flex: 1;
+            touch-action: manipulation;
         }
         .dish-item .dish-name {
             display: inline;
@@ -474,6 +483,7 @@
             border-bottom: 1px dashed #a86a72;
             user-select: none;
             transition: color 0.2s;
+            touch-action: manipulation;
         }
         .composition-toggle:hover {
             color: #7a4a4a;
@@ -516,6 +526,7 @@
             transition: 0.3s;
             margin-top: 10px;
             box-shadow: 0 8px 25px rgba(168, 106, 114, 0.3);
+            touch-action: manipulation;
         }
         .btn-submit:hover {
             transform: translateY(-2px);
@@ -632,6 +643,14 @@
             .gift-message { padding: 15px 18px; }
             .gift-message p { font-size: 0.9rem; }
             .composition-toggle { font-size: 0.7rem; }
+            /* Увеличиваем чекбоксы на телефоне */
+            .dish-item input[type="checkbox"],
+            .dish-item input[type="radio"] {
+                width: 24px;
+                height: 24px;
+                min-width: 24px;
+                min-height: 24px;
+            }
         }
 
         @media (max-width: 430px) {
@@ -647,6 +666,13 @@
             .gift-message p { font-size: 0.85rem; }
             .dish-item .dish-composition { font-size: 0.65rem; }
             .composition-toggle { font-size: 0.65rem; }
+            .dish-item input[type="checkbox"],
+            .dish-item input[type="radio"] {
+                width: 22px;
+                height: 22px;
+                min-width: 22px;
+                min-height: 22px;
+            }
         }
     </style>
 </head>
@@ -753,7 +779,7 @@
     </div>
 
     <!-- ФОРМА -->
-    <form id="wedding-form" action="https://formspree.io/f/mvzepgby" method="POST">
+    <form id="wedding-form" action="https://formspree.io/f/mvzepgby" method="POST" style="touch-action: manipulation;">
 
         <div class="form-group">
             <label for="guest-name">Ваше имя <span class="required-star">*</span></label>

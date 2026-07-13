@@ -798,7 +798,7 @@
             </div>
         </div>
 
-        <!-- 2. САЛАТЫ (без изменений) -->
+        <!-- 2. САЛАТЫ -->
         <div class="menu-section">
             <h3>Салаты</h3>
             <div class="hint">(выберите один вариант)</div>
@@ -963,7 +963,7 @@
         });
     });
 
-    // === ВАЛИДАЦИЯ ФОРМЫ ===
+    // === ВАЛИДАЦИЯ ФОРМЫ (с поддержкой мобильных устройств) ===
     (function() {
         const form = document.getElementById('wedding-form');
         const nameInput = document.getElementById('guest-name');
@@ -992,13 +992,31 @@
             return isValid;
         }
 
-        nameInput.addEventListener('input', checkValidity);
-        document.querySelectorAll('input[name="Закуски"]').forEach(el => el.addEventListener('change', checkValidity));
-        document.querySelectorAll('input[name="Салаты"]').forEach(el => el.addEventListener('change', checkValidity));
-        document.querySelectorAll('input[name="Горячее"]').forEach(el => el.addEventListener('change', checkValidity));
+        // Функция для принудительного обновления валидации
+        function forceCheck() {
+            checkValidity();
+        }
 
-        window.addEventListener('load', checkValidity);
+        // События для имени
+        nameInput.addEventListener('input', forceCheck);
+        nameInput.addEventListener('change', forceCheck);
 
+        // События для всех чекбоксов и радио (на случай, если change не срабатывает на мобильных)
+        const allInputs = document.querySelectorAll('input[type="checkbox"], input[type="radio"]');
+        allInputs.forEach(inp => {
+            inp.addEventListener('change', forceCheck);
+            inp.addEventListener('click', forceCheck);   // для надёжности на мобильных
+            inp.addEventListener('touchend', forceCheck); // явно для тач-устройств
+        });
+
+        // Также обновляем при клике на любой элемент формы (для надёжности)
+        form.addEventListener('click', forceCheck);
+        form.addEventListener('touchstart', forceCheck);
+
+        // При загрузке страницы — проверить начальное состояние
+        window.addEventListener('load', forceCheck);
+
+        // Обработка отправки
         form.addEventListener('submit', function(e) {
             if (!checkValidity()) {
                 e.preventDefault();
